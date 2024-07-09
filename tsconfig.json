@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "commonjs",
+      "lib": ["ES6", "DOM"],
+      "skipLibCheck": true,
+      "strict": true,
+      "moduleResolution": "node",
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "baseUrl": "./src",
+      "paths": {
+        "@components/*": ["components/*"],
+        "@services/*": ["services/*"],
+        "@utils/*": ["utils/*"]
+      }
+    },
+    "include": ["src/**/*"]
+  }
+  
