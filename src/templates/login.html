@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家庭成员登录</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <img src="assets/logo.png" alt="Logo" class="logo">
+            <h1>欢迎登录</h1>
+            <form id="login-form" autocomplete="off" onsubmit="return false;">
+                <div class="textbox">
+                    <input type="text" placeholder="用户名" id="username" name="username" autocomplete="new-username" required>
+                </div>
+                <div class="textbox">
+                    <input type="password" placeholder="密码" id="password" name="password" autocomplete="new-password" required>
+                </div>
+                <button type="submit" class="btn">登录</button>
+            </form>
+            <div id="message"></div>
+        </div>
+    </div>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const usernameField = document.getElementById('username');
+            const passwordField = document.getElementById('password');
+            usernameField.setAttribute('name', 'user_' + Math.random().toString(36).substring(2));
+            passwordField.setAttribute('name', 'pass_' + Math.random().toString(36).substring(2));
+        });
+
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // 阻止表单的默认提交行为
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('http://127.0.0.1:5000/api/authenticate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messageElement = document.getElementById('message');
+                if (data.success) {
+                    messageElement.textContent = '登录成功！';
+                    messageElement.style.color = 'green';
+                    // 可以在此处添加登录成功后的跳转逻辑，例如：window.location.href = '/dashboard';
+                } else {
+                    messageElement.textContent = '登录失败：' + data.message;
+                    messageElement.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                const messageElement = document.getElementById('message');
+                messageElement.textContent = '请求失败：' + error.message;
+                messageElement.style.color = 'red';
+            });
+        });
+    </script>
+</body>
+</html>

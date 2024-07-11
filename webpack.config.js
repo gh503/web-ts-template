@@ -4,19 +4,32 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
   const envFile = isProduction ? '.env.production' : '.env.development';
 
   return {
-    entry: './src/index.ts',
+    entry: {
+        main: [
+            './src/index.ts',
+            './src/styles/login.css',
+        ]
+    },
     module: {
       rules: [
         {
           test: /\.ts$/,
           use: 'ts-loader',
           exclude: /node_modules/
+        },
+        {
+          test: /\.css$/,
+          use: [
+            MiniCssExtractPlugin.loader,
+            'css-loader'
+          ]
         }
       ]
     },
@@ -37,16 +50,24 @@ module.exports = (env, argv) => {
     plugins: [
       new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, 'public', 'index.html'),
+        template: path.resolve(__dirname, 'src', 'templates', 'index.html'),
         inject: 'body',
       }),
       new CopyWebpackPlugin({
         patterns: [
-          { from: 'public', to: '', globOptions: {
+          { from: path.resolve(__dirname, 'src', 'assets'), to: 'assets', globOptions: {
+              ignore: []
+            }
+          },
+          {
+            from: path.resolve(__dirname, 'src', 'templates'), to: '', globOptions: {
               ignore: ['**/index.html']  // 忽略 index.html 文件
             }
-          }  // 将 public 目录中的所有文件复制到输出目录
+          }
         ]
+      }),
+      new MiniCssExtractPlugin({
+        filename: 'style.css',
       }),
       new Dotenv({
         path: path.resolve(__dirname, envFile), // 确保 env 文件被正确加载
