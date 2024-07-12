@@ -1,10 +1,9 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
@@ -12,26 +11,12 @@ module.exports = (env, argv) => {
 
   return {
     entry: {
-        main: [
-            './src/index.ts',
-            './src/styles/login.css',
-        ]
+      index: './src/index.ts',
+      login: './src/login.ts'
     },
-    module: {
-      rules: [
-        {
-          test: /\.ts$/,
-          use: 'ts-loader',
-          exclude: /node_modules/
-        },
-        {
-          test: /\.css$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            'css-loader'
-          ]
-        }
-      ]
+    output: {
+      filename: '[name].[contenthash].bundle.js',
+      path: path.resolve(__dirname, 'dist'),
     },
     resolve: {
       extensions: ['.ts', '.js'],
@@ -41,33 +26,50 @@ module.exports = (env, argv) => {
         '@utils': path.resolve(__dirname, 'src/utils/')
       }
     },
-    output: {
-      filename: '[name].[contenthash].js', // 使用内容散列确保唯一性
-      chunkFilename: '[name].[contenthash].bundle.js', // 使用内容散列确保唯一性
-      path: path.resolve(__dirname, 'dist'),
-      publicPath: '/'
+    module: {
+      rules: [
+        {
+          test: /\.ts$/,
+          use: 'ts-loader',
+          exclude: /node_modules/
+        },
+        {
+          test: /\.css$/i,
+          use: [MiniCssExtractPlugin.loader, 'css-loader']
+        },
+        {
+          test: /\.(png|jpg|gif|svg)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/[name][ext][query]',
+          },
+        },
+      ]
     },
     plugins: [
-      new CleanWebpackPlugin(),
+      new MiniCssExtractPlugin({
+        filename: 'style.css',
+      }),
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, 'src', 'templates', 'index.html'),
-        inject: 'body',
+        filename: 'index.html',
+        chunks: ['index']
+      }),
+      new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, 'src', 'templates', 'login.html'),
+        filename: 'login.html',
+        chunks: ['login']
       }),
       new CopyWebpackPlugin({
         patterns: [
-          { from: path.resolve(__dirname, 'src', 'assets'), to: 'assets', globOptions: {
+          {
+            from: path.resolve(__dirname, 'src', 'assets'),
+            to: 'assets',
+            globOptions: {
               ignore: []
             }
           },
-          {
-            from: path.resolve(__dirname, 'src', 'templates'), to: '', globOptions: {
-              ignore: ['**/index.html']  // 忽略 index.html 文件
-            }
-          }
         ]
-      }),
-      new MiniCssExtractPlugin({
-        filename: 'style.css',
       }),
       new Dotenv({
         path: path.resolve(__dirname, envFile), // 确保 env 文件被正确加载
@@ -81,9 +83,10 @@ module.exports = (env, argv) => {
         "directory": path.join(__dirname, 'dist'),
       },
       compress: true,
-      port: 9000,
+      port: 5000,
       hot: true,
-      historyApiFallback: true, // 确保 SPA 可以正常工作
+      open: false,
+      historyApiFallback: true, // 确保 SPA 可以正常工作，返回 index.html
     },
     optimization: {
       minimize: isProduction,
