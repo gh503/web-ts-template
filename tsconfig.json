@@ -4,20 +4,38 @@
       "module": "commonjs",
       "lib": ["ES6", "DOM"],
       "skipLibCheck": true,
+
+      /* 严格类型检查 */
       "strict": true,
-      "moduleResolution": "node",
+      "noImplicitAny": true,
+      "strictNullChecks": true,
+      "noImplicitThis": true,
+      "alwaysStrict": true,
+
+      /* 模块解析选项 */
+      "moduleResolution": "Node",
+      /* 启用装饰器 */
       "experimentalDecorators": true,
+      /* 装饰器支持元数据 */
       "emitDecoratorMetadata": true,
       "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true,
+
       "outDir": "./dist",
       "rootDir": "./src",
       "baseUrl": "./src",
       "paths": {
         "@components/*": ["components/*"],
+        "@views/*": ["views/"],
         "@services/*": ["services/*"],
-        "@utils/*": ["utils/*"]
-      }
+        "@utils/*": ["utils/*"],
+      },
+
+      /* 额外检查 */
+      "noUnusedLocals": false,
+      "noUnusedParameters": true,
+      "noImplicitOverride": true,
+      "noFallthroughCasesInSwitch": true
     },
     "include": ["src/**/*"]
   }
